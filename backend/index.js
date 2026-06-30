@@ -134,7 +134,7 @@ const createTransporter = () => {
   }
 
   if (!smtpUser || !smtpPass) {
-    console.error('❌ Missing SMTP credentials:', {
+    console.error('Missing SMTP credentials:', {
       hasSMTPUser: !!smtpUser,
       hasSMTPPass: !!smtpPass
     });
@@ -142,7 +142,7 @@ const createTransporter = () => {
   }
 
   // Log connection attempt (hide password)
-  console.log('📧 Creating transporter with:', {
+  console.log('Creating transporter with:', {
     user: smtpUser.substring(0, 5) + '...' + smtpUser.substring(smtpUser.indexOf('@')),
     host: smtpHost,
     port: smtpPort,
@@ -193,23 +193,23 @@ const getDefaultSender = () => {
 };
 
 const sendEmail = async ({ to, subject, text, html }) => {
-  console.log('📧 SEND EMAIL START:', { to, subject: subject.substring(0, 30) + '...' });
+  console.log('SEND EMAIL START:', { to, subject: subject.substring(0, 30) + '...' });
   
   const startTime = Date.now();
   
   try {
     const from = getDefaultSender();
-    console.log('📧 From:', from);
+    console.log('From:', from);
     
     const transporter = createTransporter();
-    console.log('📧 Transporter created, verifying connection...');
+    console.log('Transporter created, verifying connection...');
     
     // Verify connection first (this will timeout if blocked)
     try {
       await transporter.verify();
-      console.log('✅ SMTP connection verified successfully');
+      console.log('SMTP connection verified successfully');
     } catch (verifyError) {
-      console.error('❌ SMTP verification failed:', {
+      console.error('SMTP verification failed:', {
         message: verifyError.message,
         code: verifyError.code,
         command: verifyError.command
@@ -217,7 +217,7 @@ const sendEmail = async ({ to, subject, text, html }) => {
       throw verifyError;
     }
     
-    console.log('📧 Sending mail...');
+    console.log('Sending mail...');
     const result = await transporter.sendMail({
       from,
       to,
@@ -227,8 +227,8 @@ const sendEmail = async ({ to, subject, text, html }) => {
     });
     
     const duration = Date.now() - startTime;
-    console.log('✅ Email sent successfully in', duration, 'ms');
-    console.log('📧 Result:', {
+    console.log('Email sent successfully in', duration, 'ms');
+    console.log('Result:', {
       messageId: result.messageId,
       accepted: result.accepted,
       rejected: result.rejected,
@@ -238,8 +238,8 @@ const sendEmail = async ({ to, subject, text, html }) => {
     return result;
   } catch (error) {
     const duration = Date.now() - startTime;
-    console.error('❌ EMAIL SENDING FAILED after', duration, 'ms');
-    console.error('❌ Full error details:', {
+    console.error('EMAIL SENDING FAILED after', duration, 'ms');
+    console.error('Full error details:', {
       name: error.name,
       message: error.message,
       code: error.code,
@@ -717,9 +717,9 @@ app.post('/api/admin/change-password', async (req, res) => {
 
 app.post('/api/contact', async (req, res) => {
   console.log('========================================');
-  console.log('📝 CONTACT FORM SUBMISSION');
+  console.log('CONTACT FORM SUBMISSION');
   console.log('========================================');
-  console.log('📝 Request body:', {
+  console.log('Request body:', {
     email: req.body.email,
     fullName: req.body.fullName,
     company: req.body.company,
@@ -730,7 +730,7 @@ app.post('/api/contact', async (req, res) => {
   // Validate
   const error = validateInquiry(req.body);
   if (error) {
-    console.log('❌ Validation error:', error);
+    console.log('Validation error:', error);
     return res.status(400).json({ message: error });
   }
 
@@ -753,15 +753,15 @@ app.post('/api/contact', async (req, res) => {
   };
 
   // Save to Firestore
-  console.log('💾 Saving to Firestore...');
+  console.log('Saving to Firestore...');
   const db = initFirebaseAdmin().firestore();
   let docRef;
   
   try {
     docRef = await db.collection('inquiries').add(firestoreRecord);
-    console.log('✅ Inquiry saved to Firestore with ID:', docRef.id);
+    console.log('Inquiry saved to Firestore with ID:', docRef.id);
   } catch (err) {
-    console.error('❌ Firestore save error:', {
+    console.error('Firestore save error:', {
       message: err.message,
       code: err.code,
       stack: err.stack
@@ -776,20 +776,20 @@ app.post('/api/contact', async (req, res) => {
   }
 
   // Try to send email
-  console.log('📧 Attempting to send confirmation email to:', emailRecord.email);
-  console.log('📧 Environment check:', {
-    SMTP_USER: process.env.SMTP_USER ? '✅ SET' : '❌ NOT SET',
-    SMTP_PASS: process.env.SMTP_PASS ? '✅ SET' : '❌ NOT SET',
-    FROM_EMAIL: process.env.FROM_EMAIL || '❌ NOT SET (using SMTP_USER)',
+  console.log('Attempting to send confirmation email to:', emailRecord.email);
+  console.log('Environment check:', {
+    SMTP_USER: process.env.SMTP_USER ? 'SET' : 'NOT SET',
+    SMTP_PASS: process.env.SMTP_PASS ? 'SET' : 'NOT SET',
+    FROM_EMAIL: process.env.FROM_EMAIL || 'NOT SET (using SMTP_USER)',
     SMTP_HOST: process.env.SMTP_HOST || 'smtp.gmail.com (default)',
     SMTP_PORT: process.env.SMTP_PORT || '587 (default)',
-    RENDER: process.env.RENDER ? '✅ Yes' : 'No',
+    RENDER: process.env.RENDER ? 'Yes' : 'No',
     NODE_ENV: process.env.NODE_ENV || 'development'
   });
   
   try {
     await sendConfirmationEmail(emailRecord);
-    console.log('✅ Confirmation email sent successfully to:', emailRecord.email);
+    console.log('Confirmation email sent successfully to:', emailRecord.email);
     
     return res.status(201).json({ 
       message: 'Inquiry submitted successfully. Confirmation email sent.',
@@ -798,7 +798,7 @@ app.post('/api/contact', async (req, res) => {
   } catch (err) {
     // Log EVERYTHING about the error
     console.error('========================================');
-    console.error('❌❌❌ EMAIL SENDING FAILED ❌❌❌');
+    console.error('EMAIL SENDING FAILED');
     console.error('========================================');
     console.error('Error Name:', err.name);
     console.error('Error Message:', err.message);

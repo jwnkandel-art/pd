@@ -320,14 +320,14 @@
 
     <!-- FEATURED EVENT -->
     <div class="featured-event reveal" id="featuredEventSection">
-      <div class="featured-label">⭐ Featured Event</div>
+      <div class="featured-label">Featured Event</div>
       <h2 id="featuredTitle">NexaAI Global AI Summit 2025</h2>
       <p id="featuredDescription">The world's premier gathering for enterprise AI leaders. Two days of keynotes, deep-dive workshops, live product demos, and unparalleled networking with 3,000+ AI practitioners from 60+ countries.</p>
       <div class="featured-details" id="featuredDetails">
-        <div class="featured-detail">📅 <span>15–16 September 2025</span></div>
-        <div class="featured-detail">📍 <span>ExCeL London, Royal Docks</span></div>
-        <div class="featured-detail">👥 <span>3,000+ Attendees Expected</span></div>
-        <div class="featured-detail">🌐 <span>In-Person + Live Stream</span></div>
+        <div class="featured-detail"><span>15–16 September 2025</span></div>
+        <div class="featured-detail"><span>ExCeL London, Royal Docks</span></div>
+        <div class="featured-detail"><span>3,000+ Attendees Expected</span></div>
+        <div class="featured-detail"><span>In-Person + Live Stream</span></div>
       </div>
       <div class="countdown-row" id="countdown">
         <div class="countdown-box"><div class="countdown-val" id="cd-days">—</div><div class="countdown-lbl">Days</div></div>
@@ -453,7 +453,7 @@
     const date = formatDisplayDate(event.eventDate || event.createdAt || '');
     const category = eventCategory(event);
     const badgeClass = badgeClassForCategory(category, isPast);
-    const location = event.location ? `📍 ${event.location}` : event.mode ? `📍 ${event.mode}` : 'Location TBD';
+    const location = event.location ? `${event.location}` : event.mode ? `${event.mode}` : 'Location TBD';
     const availability = event.status ? `${event.status}` : 'Open registration';
     const ctaText = isPast ? 'View Recap' : 'Register Free';
     const ctaLink = isPast ? '#' : 'contact.html';
@@ -518,10 +518,10 @@
       const date = formatEventDate(featured.eventDate || featured.createdAt || '');
       featuredSection.classList.remove('hidden');
       featuredDetails.innerHTML = `
-        <div class="featured-detail">📅 <span>${date ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD'}</span></div>
-        <div class="featured-detail">📍 <span>${featured.location || featured.mode || 'TBD'}</span></div>
-        <div class="featured-detail">👥 <span>${featured.capacity ? featured.capacity : 'Limited seats'}</span></div>
-        <div class="featured-detail">🌐 <span>${featured.mode || 'In Person'}</span></div>
+        <div class="featured-detail"><span>${date ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD'}</span></div>
+        <div class="featured-detail"><span>${featured.location || featured.mode || 'TBD'}</span></div>
+        <div class="featured-detail"><span>${featured.capacity ? featured.capacity : 'Limited seats'}</span></div>
+        <div class="featured-detail"><span>${featured.mode || 'In Person'}</span></div>
       `;
       featuredPrimaryCta.href = featured.link || 'contact.html';
       featuredPrimaryCta.textContent = featured.link ? 'Register Now' : 'Register Now — Save Your Seat';
@@ -587,7 +587,7 @@
     e.preventDefault();
     const btn = e.target.querySelector('button');
     if (!btn) return;
-    btn.textContent = '✓ Subscribed!';
+    btn.textContent = 'Subscribed!';
     btn.disabled = true;
     btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
   }

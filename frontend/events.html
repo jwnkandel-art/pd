@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events | NexaAI</title>
+  <meta name="description" content="Upcoming and past NexaAI events — summits, webinars, workshops, and conferences worldwide." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .events-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+    .events-tab {
+      padding: 10px 28px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .events-tab.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .events-tab:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+
+    .event-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .event-date-block {
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: var(--white);
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .event-day {
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--blue);
+    }
+    .event-month {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+    .event-year {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.55);
+      margin-top: 2px;
+    }
+    .event-body {
+      padding: 24px 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .event-type-badge {
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .badge-summit   { background: rgba(0,198,255,0.12); color: var(--blue-dark); border: 1px solid rgba(0,198,255,0.25); }
+    .badge-webinar  { background: rgba(99,102,241,0.1); color: #4f46e5; border: 1px solid rgba(99,102,241,0.2); }
+    .badge-workshop { background: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.2); }
+    .badge-conference { background: rgba(245,158,11,0.1); color: #d97706; border: 1px solid rgba(245,158,11,0.2); }
+    .badge-past     { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.2); }
+    .event-location {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .event-body h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.3;
+      margin: 0;
+    }
+    .event-body p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .event-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .event-spots {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .event-spots strong {
+      color: #ef4444;
+    }
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .past-event-card {
+      opacity: 0.72;
+    }
+    .past-event-card .event-date-block {
+      background: linear-gradient(135deg, #374151, #4b5563);
+    }
+    .past-event-card:hover {
+      opacity: 1;
+    }
+    .featured-event {
+      background: linear-gradient(135deg, var(--navy), #0d3b7a);
+      border-radius: var(--radius);
+      padding: 48px;
+      color: var(--white);
+      margin-bottom: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    .featured-event::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: rgba(0,198,255,0.07);
+      border-radius: 50%;
+    }
+    .featured-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,198,255,0.15);
+      border: 1px solid rgba(0,198,255,0.3);
+      color: var(--blue);
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+    .featured-event h2 {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+    .featured-event p {
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+    }
+    .featured-details {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+    }
+    .featured-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+    }
+    .countdown-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .countdown-box {
+      text-align: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 64px;
+    }
+    .countdown-val {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--blue);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .countdown-lbl {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+    .newsletter-strip {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      margin-top: 64px;
+    }
+    .newsletter-text h3 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .newsletter-text p  { color: var(--text-muted); font-size: 0.9rem; }
+    .newsletter-form { display: flex; gap: 10px; flex-shrink: 0; }
+    .newsletter-form input {
+      padding: 11px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-family: var(--font);
+      font-size: 0.9rem;
+      outline: none;
+      width: 240px;
+      transition: border-color 0.25s;
+    }
+    .newsletter-form input:focus { border-color: var(--blue); }
+
+    @media (max-width: 700px) {
+      .event-card { flex-direction: column; }
+      .event-date-block { flex-direction: row; gap: 8px; padding: 14px 20px; min-width: unset; }
+      .featured-event { padding: 28px 20px; }
+      .newsletter-strip { flex-direction: column; align-items: flex-start; }
+      .newsletter-form { flex-direction: column; width: 100%; }
+      .newsletter-form input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="casestudies.html">Case Studies</a></li>
+      <li><a href="feedback.html">Feedback</a></li>
+      <li><a href="articles.html">Articles</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="margin-bottom:14px;">Live &amp; Online</div>
+    <h1>Events &amp; Conferences</h1>
+    <p>Join thousands of business and technology leaders at NexaAI's global summits, webinars, and workshops.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- FEATURED EVENT -->
+    <div class="featured-event reveal" id="featuredEventSection">
+      <div class="featured-label">⭐ Featured Event</div>
+      <h2 id="featuredTitle">NexaAI Global AI Summit 2025</h2>
+      <p id="featuredDescription">The world's premier gathering for enterprise AI leaders. Two days of keynotes, deep-dive workshops, live product demos, and unparalleled networking with 3,000+ AI practitioners from 60+ countries.</p>
+      <div class="featured-details" id="featuredDetails">
+        <div class="featured-detail">📅 <span>15–16 September 2025</span></div>
+        <div class="featured-detail">📍 <span>ExCeL London, Royal Docks</span></div>
+        <div class="featured-detail">👥 <span>3,000+ Attendees Expected</span></div>
+        <div class="featured-detail">🌐 <span>In-Person + Live Stream</span></div>
+      </div>
+      <div class="countdown-row" id="countdown">
+        <div class="countdown-box"><div class="countdown-val" id="cd-days">—</div><div class="countdown-lbl">Days</div></div>
+        <div class="countdown-box"><div class="countdown-val" id="cd-hours">—</div><div class="countdown-lbl">Hours</div></div>
+        <div class="countdown-box"><div class="countdown-val" id="cd-mins">—</div><div class="countdown-lbl">Mins</div></div>
+        <div class="countdown-box"><div class="countdown-val" id="cd-secs">—</div><div class="countdown-lbl">Secs</div></div>
+      </div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; position:relative; z-index:1;">
+        <a href="contact.html" class="btn btn-primary" id="featuredPrimaryCta">Register Now — Save Your Seat</a>
+        <a href="#" class="btn btn-outline" id="featuredSecondaryCta">Download Agenda</a>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="events-tabs reveal">
+      <button class="events-tab active" data-tab="upcoming">Upcoming Events</button>
+      <button class="events-tab" data-tab="past">Past Events</button>
+    </div>
+
+    <!-- UPCOMING -->
+    <div id="tab-upcoming" class="events-list">
+      <div id="upcomingEventsPlaceholder" style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">Loading events…</div>
+    </div>
+
+    <!-- PAST (hidden by default) -->
+    <div id="tab-past" class="events-list" style="display:none;">
+      <div id="pastEventsPlaceholder" style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">Loading past events…</div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <!-- <div class="newsletter-strip reveal">
+      <div class="newsletter-text">
+        <h3>Never Miss a NexaAI Event</h3>
+        <p>Get early access to registrations, agenda releases, and exclusive speaker announcements straight to your inbox.</p>
+      </div>
+      <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+        <input type="email" placeholder="your@email.com" required />
+        <button type="submit" class="btn btn-primary btn-sm">Notify Me</button>
+      </form>
+    </div> -->
+
+  </div>
+</section>
+
+<div class="cta-strip">
+  <div class="container">
+    <h2>Want to Speak, Sponsor, or Partner at a NexaAI Event?</h2>
+    <p>We welcome thought leaders, sponsors, and community partners. Let's build something memorable together.</p>
+    <a href="contact.html" class="btn btn-primary">Get In Touch</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+        <p>Empowering industries with intelligent AI solutions and transforming the digital employee experience worldwide.</p>
+      </div>
+      <div class="footer-col"><h4>Solutions</h4><ul><li><a href="solutions.html">AI Virtual Assistant</a></li><li><a href="solutions.html">Prototyping Tools</a></li><li><a href="solutions.html">DEX Platform</a></li><li><a href="solutions.html">Analytics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="casestudies.html">Case Studies</a></li><li><a href="articles.html">Articles</a></li><li><a href="events.html">Events</a></li><li><a href="gallery.html">Gallery</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="admin.html">Admin Area</a></li><li><a href="mailto:hello@nexaai.com">hello@nexaai.com</a></li><li><a href="tel:+441234567890">+44 1234 567 890</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 NexaAI. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const tabs = document.querySelectorAll('.events-tab');
+  const tabUpcoming = document.getElementById('tab-upcoming');
+  const tabPast = document.getElementById('tab-past');
+  const upcomingPlaceholder = document.getElementById('upcomingEventsPlaceholder');
+  const pastPlaceholder = document.getElementById('pastEventsPlaceholder');
+  const featuredSection = document.getElementById('featuredEventSection');
+  const featuredTitle = document.getElementById('featuredTitle');
+  const featuredDescription = document.getElementById('featuredDescription');
+  const featuredDetails = document.getElementById('featuredDetails');
+  const featuredPrimaryCta = document.getElementById('featuredPrimaryCta');
+  const featuredSecondaryCta = document.getElementById('featuredSecondaryCta');
+  const countdown = document.getElementById('countdown');
+  let featuredEventDate = null;
+
+  function formatEventDate(dateString) {
+    const date = new Date(dateString);
+    if (!dateString || Number.isNaN(date.getTime())) return null;
+    return date;
+  }
+
+  function formatDisplayDate(dateString) {
+    const date = formatEventDate(dateString);
+    if (!date) return { day: '--', month: '---', year: '----', label: 'TBD' };
+    return {
+      day: String(date.getDate()).padStart(2, '0'),
+      month: date.toLocaleString('en-GB', { month: 'short' }),
+      year: String(date.getFullYear()),
+      label: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+    };
+  }
+
+  function eventCategory(event) {
+    const title = String(event.title || '').toLowerCase();
+    if (title.includes('webinar')) return 'Webinar';
+    if (title.includes('workshop')) return 'Workshop';
+    if (title.includes('summit')) return 'Summit';
+    if (title.includes('conference')) return 'Conference';
+    return 'Event';
+  }
+
+  function badgeClassForCategory(category, isPast) {
+    if (isPast) return 'badge-past';
+    switch (category.toLowerCase()) {
+      case 'webinar': return 'badge-webinar';
+      case 'workshop': return 'badge-workshop';
+      case 'summit': return 'badge-summit';
+      case 'conference': return 'badge-conference';
+      default: return 'badge-webinar';
+    }
+  }
+
+  function buildEventCard(event, isPast = false) {
+    const date = formatDisplayDate(event.eventDate || event.createdAt || '');
+    const category = eventCategory(event);
+    const badgeClass = badgeClassForCategory(category, isPast);
+    const location = event.location ? `📍 ${event.location}` : event.mode ? `📍 ${event.mode}` : 'Location TBD';
+    const availability = event.status ? `${event.status}` : 'Open registration';
+    const ctaText = isPast ? 'View Recap' : 'Register Free';
+    const ctaLink = isPast ? '#' : 'contact.html';
+    const description = String(event.description || '').trim() || 'Details about the event will be available soon.';
+
+    return `
+      <div class="event-card reveal${isPast ? ' past-event-card' : ''}">
+        <div class="event-date-block">
+          <div class="event-day">${date.day}</div>
+          <div class="event-month">${date.month}</div>
+          <div class="event-year">${date.year}</div>
+        </div>
+        <div class="event-body">
+          <div class="event-meta">
+            <span class="event-type-badge ${badgeClass}">${isPast ? 'Past Event' : category}</span>
+            <span class="event-location">${location}</span>
+          </div>
+          <h3>${String(event.title || 'Untitled Event')}</h3>
+          <p>${description}</p>
+          <div class="event-footer">
+            <span class="event-spots">${availability}</span>
+            <a href="${ctaLink}" class="btn ${isPast ? 'btn-dark btn-sm' : event.status && event.status.toLowerCase() === 'cancelled' ? 'btn-outline btn-sm' : 'btn-dark btn-sm'}">${ctaText}</a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderEvents(events) {
+    const now = Date.now();
+    const upcoming = [];
+    const past = [];
+
+    events.forEach(event => {
+      const eventDate = formatEventDate(event.eventDate || event.createdAt || '');
+      if (!eventDate || eventDate.getTime() < now) {
+        past.push(event);
+      } else {
+        upcoming.push(event);
+      }
+    });
+
+    upcoming.sort((a, b) => formatEventDate(a.eventDate || a.createdAt).getTime() - formatEventDate(b.eventDate || b.createdAt).getTime());
+    past.sort((a, b) => formatEventDate(b.eventDate || b.createdAt).getTime() - formatEventDate(a.eventDate || a.createdAt).getTime());
+
+    if (upcoming.length) {
+      upcomingPlaceholder.innerHTML = upcoming.map(event => buildEventCard(event)).join('');
+    } else {
+      upcomingPlaceholder.innerHTML = '<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">No upcoming events scheduled.</div>';
+    }
+
+    if (past.length) {
+      pastPlaceholder.innerHTML = past.map(event => buildEventCard(event, true)).join('');
+    } else {
+      pastPlaceholder.innerHTML = '<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">No past events available yet.</div>';
+    }
+
+    const featured = upcoming.find(event => event.featured) || upcoming[0] || past[0];
+    if (featured) {
+      featuredTitle.textContent = featured.title || 'Upcoming NexaAI Event';
+      featuredDescription.textContent = featured.description || 'Important event details will be updated here soon.';
+      const date = formatEventDate(featured.eventDate || featured.createdAt || '');
+      featuredSection.classList.remove('hidden');
+      featuredDetails.innerHTML = `
+        <div class="featured-detail">📅 <span>${date ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD'}</span></div>
+        <div class="featured-detail">📍 <span>${featured.location || featured.mode || 'TBD'}</span></div>
+        <div class="featured-detail">👥 <span>${featured.capacity ? featured.capacity : 'Limited seats'}</span></div>
+        <div class="featured-detail">🌐 <span>${featured.mode || 'In Person'}</span></div>
+      `;
+      featuredPrimaryCta.href = featured.link || 'contact.html';
+      featuredPrimaryCta.textContent = featured.link ? 'Register Now' : 'Register Now — Save Your Seat';
+      featuredSecondaryCta.href = '#';
+      featuredSecondaryCta.textContent = 'Download Agenda';
+      featuredEventDate = date;
+      updateCountdown();
+    }
+  }
+
+  function updateCountdown() {
+    if (!featuredEventDate) return;
+    const target = featuredEventDate.getTime();
+    const now = Date.now();
+    const diff = target - now;
+    if (diff <= 0) {
+      countdown.innerHTML = '<span style="color:#00c6ff;font-weight:700;">Event is Live!</span>';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
+  }
+
+  async function loadEvents() {
+    try {
+      const response = await fetch(`${backendBase}/api/events`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to load events.');
+      const events = Array.isArray(data) ? data : [];
+      renderEvents(events);
+    } catch (error) {
+      const message = error.message || 'Could not load event listings.';
+      if (upcomingPlaceholder) upcomingPlaceholder.innerHTML = `<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:#b42318;">${message}</div>`;
+      if (pastPlaceholder) pastPlaceholder.innerHTML = `<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:#b42318;">${message}</div>`;
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.dataset.tab === 'upcoming') {
+        tabUpcoming.style.display = '';
+        tabPast.style.display = 'none';
+      } else {
+        tabUpcoming.style.display = 'none';
+        tabPast.style.display = '';
+      }
+    });
+  });
+
+  loadEvents();
+
+  setInterval(updateCountdown, 1000);
+
+  function handleNewsletterSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    if (!btn) return;
+    btn.textContent = '✓ Subscribed!';
+    btn.disabled = true;
+    btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+  }
+</script>
+</body>
+</html>

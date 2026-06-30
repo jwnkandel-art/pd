@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Articles: NexaAI</title>
+  <meta name="description" content="Insights, thought leadership, and AI industry updates from the NexaAI team." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="casestudies.html">Case Studies</a></li>
+      <li><a href="feedback.html">Feedback</a></li>
+      <li><a href="articles.html">Articles</a></li>
+            <li><a href="events.html">Events</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="margin-bottom:14px;">Knowledge Hub</div>
+    <h1>Articles &amp; Insights</h1>
+    <p>Thought leadership, industry trends, and practical AI guidance from the NexaAI team.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="cards-grid" id="articlesGrid">
+      <div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">Loading articles…</div>
+    </div>
+
+    <!--
+    <div style="text-align:center; margin-top:48px;">
+      <p style="color:var(--text-muted); margin-bottom:16px;">Stay ahead of the AI curve</p>
+      <div style="display:flex; max-width:420px; margin:0 auto; gap:12px;">
+        <input type="email" placeholder="Enter your email" style="flex:1; padding:12px 16px; border:1.5px solid var(--border); border-radius:50px; font-family:var(--font); font-size:0.9rem; outline:none; background:var(--white);" />
+        <button class="btn btn-primary btn-sm" style="white-space:nowrap;">Subscribe</button>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+<div class="cta-strip">
+  <div class="container">
+    <h2>Want Expert AI Guidance for Your Industry?</h2>
+    <p>Our team publishes new insights weekly. Or speak directly with an AI specialist.</p>
+    <a href="contact.html" class="btn btn-primary">Speak to an Expert</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+        <p>Empowering industries with intelligent AI solutions and transforming the digital employee experience worldwide.</p>
+      </div>
+      <div class="footer-col"><h4>Solutions</h4><ul><li><a href="solutions.html">AI Virtual Assistant</a></li><li><a href="solutions.html">Prototyping Tools</a></li><li><a href="solutions.html">DEX Platform</a></li><li><a href="solutions.html">Analytics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="casestudies.html">Case Studies</a></li><li><a href="articles.html">Articles</a></li><li><a href="feedback.html">Testimonials</a></li><li><a href="gallery.html">Gallery</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="admin.html">Admin Area</a></li><li><a href="mailto:hello@nexaai.com">hello@nexaai.com</a></li><li><a href="tel:+441234567890">+44 1234 567 890</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 NexaAI. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  console.log('articles.html inline script loaded');
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const articlesGrid = document.getElementById('articlesGrid');
+
+  function formatDate(isoString) {
+    if (!isoString) return 'Unknown date';
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return 'Unknown date';
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  }
+
+  function renderArticles(items) {
+    if (!articlesGrid) return;
+    if (!items.length) {
+      articlesGrid.innerHTML = '<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">No articles available right now.</div>';
+      return;
+    }
+
+    articlesGrid.innerHTML = items.map((item, index) => {
+      const published = item.publishedAt || item.createdAt || '';
+      const summary = String(item.summary || item.excerpt || item.body || '').trim();
+      const category = String(item.category || item.tags || 'Insights').trim();
+      const readTime = item.readTime ? `${item.readTime} min read` : '';
+      const title = String(item.title || 'Untitled article').trim();
+      const imageUrl = Array.isArray(item.images) && item.images.length ? item.images[0] : '';
+      const thumbStyle = imageUrl ? `background-image:url(${imageUrl}); background-size:cover; background-position:center;` : 'background:linear-gradient(135deg,#0a1f44,#0d3b7a);';
+      const href = item.url
+        ? item.url
+        : item.slug
+          ? `article-detail.html?slug=${encodeURIComponent(item.slug)}`
+          : item.id
+            ? `article-detail.html?id=${encodeURIComponent(item.id)}`
+            : '#';
+      return `
+        <article class="article-card reveal visible ${index % 3 === 1 ? 'reveal-delay-1' : index % 3 === 2 ? 'reveal-delay-2' : ''}">
+          <div class="article-thumb" style="${thumbStyle}">
+            ${imageUrl ? '' : '<i class="bi bi-book-half"></i>'}
+          </div>
+          <div class="article-body">
+            <div class="article-meta">
+              <span class="article-cat">${category}</span>
+              <span class="article-date">${formatDate(published)}</span>
+            </div>
+            <h3>${title}</h3>
+            <p>${summary || 'Read our latest insights on AI strategy, digital workplace transformation, and generative intelligence.'}</p>
+            <div class="article-footer">
+              <span class="read-time">${readTime}</span>
+              <a href="${href}" class="btn btn-dark btn-sm">Read More</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function loadArticles() {
+    if (!articlesGrid) return;
+    try {
+      const response = await fetch(`${backendBase}/api/articles`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
+      console.log('Articles fetch status:', response.status);
+      const data = await response.json();
+      console.log('Articles API response:', data);
+      if (!response.ok && response.status !== 304) throw new Error(data.message || 'Unable to load articles.');
+      const articleItems = Array.isArray(data) ? data.filter(item => String(item.status || '').toLowerCase() !== 'draft') : [];
+      console.log('Filtered article items:', articleItems);
+      renderArticles(articleItems);
+    } catch (error) {
+      if (articlesGrid) {
+        articlesGrid.innerHTML = `<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:#b42318;">${error.message}</div>`;
+      }
+    }
+  }
+
+  loadArticles();
+</script>
+</body>
+</html>

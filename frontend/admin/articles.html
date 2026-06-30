@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Articles | NexaAI</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.NEXAAI_BACKEND_URL = 'http://localhost:4000';
+  </script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="articles.html" class="active">Articles</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="dashboard show" id="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;">Admin Panel</p>
+      <h2>Articles Management</h2>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <span id="adminUserLabel" style="font-size:0.9rem; color:var(--text-muted);">Signed in</span>
+      <button id="logoutBtn" class="btn btn-dark btn-sm">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-table-wrap" style="margin-bottom:24px;">
+    <div class="admin-table-header">
+      <h3>Create or edit article</h3>
+      <!-- <span style="font-size:0.82rem; color:var(--text-muted);">Saved to Firestore through the existing articles API</span> -->
+    </div>
+    <form id="articleForm" style="display:grid; gap:12px; padding:24px;">
+      <input type="hidden" id="articleId" />
+      <input id="articleTitle" type="text" placeholder="Article title" required style="padding:12px; border:1px solid #d8dce5; border-radius:10px;" />
+      <input id="articleSummary" type="text" placeholder="Short summary" style="padding:12px; border:1px solid #d8dce5; border-radius:10px;" />
+      <textarea id="articleBody" rows="6" placeholder="Article body" required style="padding:12px; border:1px solid #d8dce5; border-radius:10px;"></textarea>
+      
+      <!-- Image Upload Section -->
+      <div style="border:2px dashed #d8dce5; border-radius:10px; padding:20px; text-align:center; cursor:pointer;" id="imageDropZone">
+        <input type="file" id="articleImages" multiple accept="image/*" style="display:none;" />
+        <div style="pointer-events:none;">
+          <i class="bi bi-cloud-arrow-up" style="font-size:28px; color:#8892a6; display:block; margin-bottom:8px;"></i>
+          <p style="margin:0; color:#8892a6; font-weight:500;">Click to upload or drag images here</p>
+          <p style="margin:4px 0 0 0; color:#a8b4c1; font-size:0.85rem;">Max 1 image, JPG/PNG/WebP</p>
+        </div>
+      </div>
+      
+      <!-- Image Preview -->
+      <div id="imagePreviewContainer" style="display:none; border:1px solid #d8dce5; border-radius:10px; padding:12px;">
+        <p style="margin:0 0 12px 0; font-size:0.9rem; font-weight:500;">Selected images:</p>
+        <div id="imagePreview" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(80px, 1fr)); gap:8px;"></div>
+      </div>
+      
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <input id="articlePublishedAt" type="date" style="padding:12px; border:1px solid #d8dce5; border-radius:10px;" />
+        <select id="articleStatus" style="padding:12px; border:1px solid #d8dce5; border-radius:10px;">
+          <option value="Draft">Draft</option>
+          <option value="Published">Published</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-dark">Save Article</button>
+        <button type="button" id="cancelArticleEdit" class="btn">Cancel</button>
+      </div>
+      <div id="articleMessage" style="display:none; padding:10px 12px; border-radius:10px; background:#f7f9fc;"></div>
+    </form>
+  </div>
+
+  <div class="admin-table-wrap">
+    <div class="admin-table-header">
+      <h3>Saved articles</h3>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Click an item to edit it</span>
+    </div>
+    <div id="articleList" style="padding:24px;"></div>
+    <div id="articlePagination" style="padding:12px 24px; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+      <button type="button" id="articlePrevPage" class="btn btn-sm" style="padding:6px 12px;">← Previous</button>
+      <span id="articlePageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+      <button type="button" id="articleNextPage" class="btn btn-sm" style="padding:6px 12px;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/main.js"></script>
+<script>
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const articleForm = document.getElementById('articleForm');
+  const articleIdInput = document.getElementById('articleId');
+  const articleTitleInput = document.getElementById('articleTitle');
+  const articleSummaryInput = document.getElementById('articleSummary');
+  const articleBodyInput = document.getElementById('articleBody');
+  const articleImagesInput = document.getElementById('articleImages');
+  const articlePublishedAtInput = document.getElementById('articlePublishedAt');
+  const articleStatusInput = document.getElementById('articleStatus');
+  const articleMessage = document.getElementById('articleMessage');
+  const articleList = document.getElementById('articleList');
+  const cancelArticleEdit = document.getElementById('cancelArticleEdit');
+  const imageDropZone = document.getElementById('imageDropZone');
+  const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+  const imagePreview = document.getElementById('imagePreview');
+
+  // Drag and drop handling
+  imageDropZone.addEventListener('click', () => articleImagesInput.click());
+  
+  imageDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    imageDropZone.style.borderColor = '#1f2937';
+    imageDropZone.style.background = '#f9fafb';
+  });
+  
+  imageDropZone.addEventListener('dragleave', () => {
+    imageDropZone.style.borderColor = '#d8dce5';
+    imageDropZone.style.background = 'transparent';
+  });
+  
+  imageDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    imageDropZone.style.borderColor = '#d8dce5';
+    imageDropZone.style.background = 'transparent';
+    handleImageSelection(e.dataTransfer.files);
+  });
+
+  articleImagesInput.addEventListener('change', (e) => {
+    handleImageSelection(e.target.files);
+  });
+
+  function handleImageSelection(files) {
+    const selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+    
+    if (selectedFiles.length > 2) {
+      showArticleMessage('Maximum 2 images allowed. Selected: ' + selectedFiles.length, true);
+      return;
+    }
+    
+    if (selectedFiles.length === 0) {
+      showArticleMessage('Please select valid image files.', true);
+      return;
+    }
+
+    // Update the file input with selected files
+    const dataTransfer = new DataTransfer();
+    selectedFiles.forEach(file => dataTransfer.items.add(file));
+    articleImagesInput.files = dataTransfer.files;
+
+    // Clear and show preview container
+    imagePreview.innerHTML = '';
+    imagePreviewContainer.style.display = 'block';
+
+    // Process each file
+    selectedFiles.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.createElement('div');
+        preview.style.cssText = 'position:relative; border-radius:6px; overflow:hidden; background:#f0f0f0; aspect-ratio:1/1;';
+        preview.innerHTML = `
+          <img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;" />
+          <button type="button" class="btn btn-sm" style="position:absolute; top:4px; right:4px; padding:4px 6px; font-size:0.75rem;" data-remove-image="${idx}">Remove</button>
+        `;
+        imagePreview.appendChild(preview);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    showArticleMessage('');
+  }
+
+  imagePreview.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('[data-remove-image]');
+    if (!removeBtn) return;
+    
+    const idxToRemove = parseInt(removeBtn.getAttribute('data-remove-image'));
+    const dataTransfer = new DataTransfer();
+    const currentFiles = Array.from(articleImagesInput.files);
+    
+    currentFiles.forEach((file, i) => {
+      if (i !== idxToRemove) dataTransfer.items.add(file);
+    });
+    
+    articleImagesInput.files = dataTransfer.files;
+    
+    if (articleImagesInput.files.length === 0) {
+      imagePreviewContainer.style.display = 'none';
+      imagePreview.innerHTML = '';
+    } else {
+      handleImageSelection(articleImagesInput.files);
+    }
+  });
+
+  function showArticleMessage(message, isError = false) {
+    articleMessage.style.display = message ? 'block' : 'none';
+    articleMessage.textContent = message;
+    articleMessage.style.background = isError ? '#fff2f2' : '#f2fbf4';
+    articleMessage.style.color = isError ? '#b42318' : '#027a48';
+  }
+
+  function resetArticleForm() {
+    articleForm.reset();
+    articleIdInput.value = '';
+    articleStatusInput.value = 'Draft';
+    articleMessage.style.display = 'none';
+    imagePreviewContainer.style.display = 'none';
+    imagePreview.innerHTML = '';
+  }
+
+  let articleCurrentPage = 1;
+  let articleItemsPerPage = 10;
+  let articleAllData = [];
+
+  function displayArticlePage() {
+    const start = (articleCurrentPage - 1) * articleItemsPerPage;
+    const end = start + articleItemsPerPage;
+    const pageData = articleAllData.slice(start, end);
+    const totalPages = Math.ceil(articleAllData.length / articleItemsPerPage);
+
+    if (!pageData.length) {
+      articleList.innerHTML = '<p style="color:var(--text-muted);">No articles yet.</p>';
+    } else {
+      articleList.innerHTML = pageData.map(article => `
+        <div style="border:1px solid #e5e7eb; border-radius:14px; padding:16px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <strong>${article.title || 'Untitled article'}</strong>
+            <span style="font-size:0.85rem; color:var(--text-muted);">${article.status || 'Draft'}</span>
+          </div>
+          <p style="margin:6px 0; color:var(--text-muted);">${(article.summary || '').slice(0, 140) || 'No summary yet.'}</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm" data-edit-article="${article.id}">Edit</button>
+            <button type="button" class="btn btn-sm" style="background:#fee2e2; color:#b42318; border:1px solid #fca5a5;" data-delete-article="${article.id}"><i class="bi bi-trash"></i> Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('articlePageInfo').textContent = `Page ${articleCurrentPage} of ${totalPages}`;
+    document.getElementById('articlePrevPage').disabled = articleCurrentPage === 1;
+    document.getElementById('articleNextPage').disabled = articleCurrentPage === totalPages || totalPages === 0;
+  }
+
+  async function loadArticles() {
+    articleList.innerHTML = '<p style="color:var(--text-muted);">Loading…</p>';
+    try {
+      const response = await fetch(`${backendBase}/api/articles`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to load articles.');
+      articleAllData = Array.isArray(data) ? data : [];
+      articleCurrentPage = 1;
+      displayArticlePage();
+    } catch (error) {
+      articleList.innerHTML = `<p style="color:#b42318;">${error.message}</p>`;
+    }
+  }
+
+  articleForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    if (!articleTitleInput.value.trim() || !articleBodyInput.value.trim()) {
+      showArticleMessage('Title and body are required.', true);
+      return;
+    }
+
+    if (articleImagesInput.files.length === 0) {
+      showArticleMessage('At least one image is required.', true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', articleTitleInput.value.trim());
+    formData.append('summary', articleSummaryInput.value.trim());
+    formData.append('body', articleBodyInput.value.trim());
+    formData.append('status', articleStatusInput.value);
+    formData.append('publishedAt', articlePublishedAtInput.value || null);
+    
+    // Add all image files
+    Array.from(articleImagesInput.files).forEach((file, idx) => {
+      formData.append('images', file);
+    });
+
+    try {
+      const method = articleIdInput.value ? 'PATCH' : 'POST';
+      const url = articleIdInput.value ? `${backendBase}/api/articles/${articleIdInput.value}` : `${backendBase}/api/articles`;
+      const response = await fetch(url, {
+        method,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to save article.');
+      showArticleMessage(data.message || 'Article saved successfully.');
+      resetArticleForm();
+      loadArticles();
+    } catch (error) {
+      showArticleMessage(error.message, true);
+    }
+  });
+
+  cancelArticleEdit.addEventListener('click', resetArticleForm);
+  articleList.addEventListener('click', async (event) => {
+    // Handle Edit button
+    const editButton = event.target.closest('[data-edit-article]');
+    if (editButton) {
+      const id = editButton.getAttribute('data-edit-article');
+      try {
+        const response = await fetch(`${backendBase}/api/articles/${id}`);
+        const article = await response.json();
+        if (!response.ok) throw new Error(article.message || 'Unable to load article.');
+        articleIdInput.value = article.id;
+        articleTitleInput.value = article.title || '';
+        articleSummaryInput.value = article.summary || '';
+        articleBodyInput.value = article.body || '';
+        articlePublishedAtInput.value = article.publishedAt ? article.publishedAt.split('T')[0] : '';
+        articleStatusInput.value = article.status || 'Draft';
+        
+        // Display existing images
+        if (article.images && article.images.length > 0) {
+          imagePreview.innerHTML = article.images.map((imgUrl, idx) => `
+            <div style="position:relative; border-radius:6px; overflow:hidden; background:#f0f0f0; aspect-ratio:1/1;">
+              <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;" alt="Article image" />
+              <button type="button" class="btn btn-sm" style="position:absolute; top:4px; right:4px; padding:4px 6px; font-size:0.75rem;" data-remove-existing-image="${idx}">Remove</button>
+            </div>
+          `).join('');
+          imagePreviewContainer.style.display = 'block';
+        } else {
+          imagePreviewContainer.style.display = 'none';
+          imagePreview.innerHTML = '';
+        }
+        
+        articleTitleInput.focus();
+      } catch (error) {
+        showArticleMessage(error.message, true);
+      }
+      return;
+    }
+
+    // Handle Delete button
+    const deleteButton = event.target.closest('[data-delete-article]');
+    if (deleteButton) {
+      const id = deleteButton.getAttribute('data-delete-article');
+      if (!confirm('Are you sure you want to permanently delete this article?')) return;
+      
+      try {
+        const response = await fetch(`${backendBase}/api/articles/${id}`, {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Unable to delete article.');
+        showArticleMessage('Article deleted successfully.');
+        loadArticles();
+      } catch (error) {
+        showArticleMessage(error.message, true);
+      }
+    }
+  });
+
+  // Handle removal of existing images during edit
+  imagePreview.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('[data-remove-existing-image]');
+    if (!removeBtn) return;
+    
+    const idx = parseInt(removeBtn.getAttribute('data-remove-existing-image'));
+    removeBtn.closest('div').remove();
+    
+    if (imagePreview.children.length === 0) {
+      imagePreviewContainer.style.display = 'none';
+    }
+  });
+
+  // Pagination handlers
+  document.getElementById('articlePrevPage').addEventListener('click', () => {
+    if (articleCurrentPage > 1) {
+      articleCurrentPage--;
+      displayArticlePage();
+    }
+  });
+
+  document.getElementById('articleNextPage').addEventListener('click', () => {
+    const totalPages = Math.ceil(articleAllData.length / articleItemsPerPage);
+    if (articleCurrentPage < totalPages) {
+      articleCurrentPage++;
+      displayArticlePage();
+    }
+  });
+
+  loadArticles();
+</script>
+</body>
+</html>

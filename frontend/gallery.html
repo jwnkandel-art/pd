@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery: NexaAI</title>
+  <meta name="description" content="Photos from NexaAI events, summits, and client engagements." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      object-fit: contain;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px; right: 28px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox-caption {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 20px;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: #fff;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+    .lightbox-meta {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(88%, 700px);
+      color: rgba(255,255,255,0.92);
+      text-align: left;
+      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.48);
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 24px 40px rgba(0,0,0,0.25);
+    }
+    .lightbox-meta span {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: #a5d8ff;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .lightbox-meta p {
+      margin: 0;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="casestudies.html">Case Studies</a></li>
+      <li><a href="feedback.html">Feedback</a></li>
+      <li><a href="articles.html">Articles</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="margin-bottom:14px;">Events &amp; Moments</div>
+    <h1>Photo Gallery</h1>
+    <p>A glimpse into NexaAI's world, featuring summits, client events, team milestones, and community moments.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <div id="galleryFilters" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:40px;" class="reveal"></div>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <div style="grid-column:1 / -1; text-align:center; color:var(--text-muted); padding:24px 0;">Loading gallery…</div>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">X</button>
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous">‹</button>
+  <img src="" alt="" id="lightboxImg" />
+  <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next">›</button>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+    <div class="lightbox-meta" id="lightboxMeta">
+      <span id="lightboxCategory"></span>
+      <p id="lightboxDescription"></p>
+    </div>
+  </div>
+
+<div class="cta-strip">
+  <div class="container">
+    <h2>Want to Experience NexaAI in Person?</h2>
+    <p>Join us at our next summit or book a private workshop for your leadership team.</p>
+    <a href="contact.html" class="btn btn-primary">Register Interest</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+        <p>Empowering industries with intelligent AI solutions and transforming the digital employee experience worldwide.</p>
+      </div>
+      <div class="footer-col"><h4>Solutions</h4><ul><li><a href="solutions.html">AI Virtual Assistant</a></li><li><a href="solutions.html">Prototyping Tools</a></li><li><a href="solutions.html">DEX Platform</a></li><li><a href="solutions.html">Analytics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="casestudies.html">Case Studies</a></li><li><a href="articles.html">Articles</a></li><li><a href="feedback.html">Testimonials</a></li><li><a href="gallery.html">Gallery</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="admin.html">Admin Area</a></li><li><a href="mailto:hello@nexaai.com">hello@nexaai.com</a></li><li><a href="tel:+441234567890">+44 1234 567 890</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 NexaAI. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const galleryGrid = document.getElementById('galleryGrid');
+  const filterWrap = document.getElementById('galleryFilters');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCap = document.getElementById('lightboxCaption');
+  let allGalleryItems = [];
+  let activeFilter = 'all';
+
+  function normalizeCategory(value) {
+    const raw = String(value || 'Other').trim();
+    return raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'other';
+  }
+
+  function createFilterButtons(items) {
+    const categories = [...new Set(items.map(item => item.category || 'Other'))].filter(Boolean);
+    const buttons = ['All', ...categories];
+    filterWrap.innerHTML = buttons.map((label, index) => {
+      const value = label === 'All' ? 'all' : normalizeCategory(label);
+      const isActive = value === activeFilter;
+      return `<button class="gallery-filter-btn ${isActive ? 'active' : ''}" data-filter="${value}" style="padding:8px 20px; border-radius:50px; border:1.5px solid var(--border); background:${isActive ? 'var(--navy)' : 'var(--white)'}; color:${isActive ? '#fff' : 'var(--text)'}; font-family:var(--font); font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.25s;">${label}</button>`;
+    }).join('');
+
+    filterWrap.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter;
+        filterWrap.querySelectorAll('.gallery-filter-btn').forEach(innerBtn => {
+          innerBtn.classList.toggle('active', innerBtn.dataset.filter === activeFilter);
+          innerBtn.style.background = innerBtn.dataset.filter === activeFilter ? 'var(--navy)' : 'var(--white)';
+          innerBtn.style.color = innerBtn.dataset.filter === activeFilter ? '#fff' : 'var(--text)';
+        });
+        renderGalleryItems();
+      });
+    });
+  }
+
+  function renderGalleryItems() {
+    const visibleItems = allGalleryItems.filter(item => {
+      const categorySlug = normalizeCategory(item.category || 'Other');
+      return activeFilter === 'all' || categorySlug === activeFilter;
+    });
+
+    if (!visibleItems.length) {
+      galleryGrid.innerHTML = '<div style="grid-column:1 / -1; text-align:center; color:var(--text-muted); padding:24px 0;">No gallery items available right now.</div>';
+      return;
+    }
+
+    galleryGrid.innerHTML = visibleItems.map((item, index) => `
+      <div class="gallery-item ${index % 3 === 1 ? 'reveal-delay-1' : index % 3 === 2 ? 'reveal-delay-2' : ''}" data-category="${normalizeCategory(item.category || 'Other')}" data-description="${(item.description || '').replace(/"/g, '&quot;')}" data-title="${(item.title || 'Gallery item').replace(/"/g, '&quot;')}" data-index="${index}">
+        <img src="${item.image || ''}" alt="${item.title || 'Gallery item'}" loading="lazy" />
+        <div class="gallery-overlay">
+          <span class="gallery-caption">${item.title || 'Gallery item'}</span>
+        </div>
+      </div>
+    `).join('');
+
+    galleryGrid.querySelectorAll('.gallery-item').forEach(item => {
+      item.addEventListener('click', () => openLightbox(item));
+    });
+  }
+
+  async function loadGallery() {
+    try {
+      const response = await fetch(`${backendBase}/api/gallery`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to load gallery.');
+
+      const publishedItems = Array.isArray(data) ? data.filter(item => String(item.status || '').toLowerCase() !== 'draft') : [];
+      allGalleryItems = publishedItems;
+      createFilterButtons(allGalleryItems);
+      renderGalleryItems();
+    } catch (error) {
+      galleryGrid.innerHTML = `<div style="grid-column:1 / -1; text-align:center; color:#b42318; padding:24px 0;">${error.message}</div>`;
+    }
+  }
+
+  function openLightbox(item) {
+    const img = item.querySelector('img');
+    if (!img) return;
+    const title = item.dataset.title || item.querySelector('.gallery-caption').textContent;
+    const category = item.dataset.category ? item.dataset.category.replace(/-/g, ' ') : '';
+    const description = item.dataset.description || '';
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbCap.textContent = title;
+    document.getElementById('lightboxCategory').textContent = category ? category.charAt(0).toUpperCase() + category.slice(1) : '';
+    document.getElementById('lightboxDescription').textContent = description;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+  document.getElementById('lightboxPrev').addEventListener('click', () => {
+    const visibleCards = [...galleryGrid.querySelectorAll('.gallery-item')].filter(item => item.style.display !== 'none');
+    if (!visibleCards.length) return;
+    const currentIndex = visibleCards.findIndex(item => item.querySelector('img').src === lbImg.src);
+    const nextIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length;
+    openLightbox(visibleCards[nextIndex]);
+  });
+
+  document.getElementById('lightboxNext').addEventListener('click', () => {
+    const visibleCards = [...galleryGrid.querySelectorAll('.gallery-item')].filter(item => item.style.display !== 'none');
+    if (!visibleCards.length) return;
+    const currentIndex = visibleCards.findIndex(item => item.querySelector('img').src === lbImg.src);
+    const nextIndex = (currentIndex + 1) % visibleCards.length;
+    openLightbox(visibleCards[nextIndex]);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') document.getElementById('lightboxPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('lightboxNext').click();
+  });
+
+  loadGallery();
+</script>
+</body>
+</html>

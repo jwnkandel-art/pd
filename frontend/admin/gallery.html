@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Gallery | NexaAI</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <script>
+    window.NEXAAI_BACKEND_URL = 'http://localhost:4000';
+  </script>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="articles.html">Articles</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="dashboard show" id="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;">Admin Panel</p>
+      <h2>Gallery Management</h2>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <span id="adminUserLabel" style="font-size:0.9rem; color:var(--text-muted);">Signed in</span>
+      <button id="logoutBtn" class="btn btn-dark btn-sm">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="admin-table-wrap" style="margin-bottom:24px;">
+    <div class="admin-table-header">
+      <h3>Create or edit gallery item</h3>
+      <!-- <span style="font-size:0.82rem; color:var(--text-muted);">Saved to Firestore through the existing gallery API</span> -->
+    </div>
+    <form id="galleryForm" style="display:grid; gap:12px; padding:24px;">
+      <input type="hidden" id="galleryId" />
+      <input id="galleryTitle" type="text" placeholder="Title" required style="padding:12px; border:1px solid #d8dce5; border-radius:10px;" />
+      <select id="galleryCategory" required style="padding:12px; border:1px solid #d8dce5; border-radius:10px;">
+        <option value="">Select Category</option>
+        <option value="Portfolio">Portfolio</option>
+        <option value="Case Study">Case Study</option>
+        <option value="Team">Team</option>
+        <option value="Event">Event</option>
+        <option value="Achievement">Achievement</option>
+        <option value="Other">Other</option>
+      </select>
+      
+      <!-- Image Upload Area -->
+      <div id="galleryImageDropzone" style="border:2px dashed #d8dce5; border-radius:10px; padding:24px; text-align:center; cursor:pointer; background:#fafbfc; transition:all 0.2s;" onmouseover="this.style.borderColor='#0066cc'; this.style.background='#f0f4ff'" onmouseout="this.style.borderColor='#d8dce5'; this.style.background='#fafbfc'">
+        <input type="file" id="galleryImageInput" accept="image/*" style="display:none;" />
+        <p style="margin:0; color:var(--text-muted); font-size:0.95rem;">Drag image here or click to upload</p>
+        <p style="margin:6px 0 0 0; color:var(--text-muted); font-size:0.85rem;">Max 5MB, PNG/JPG/GIF</p>
+      </div>
+      <div id="galleryImagePreview" style="display:none;"></div>
+      
+      <textarea id="galleryDescription" rows="4" placeholder="Description" style="padding:12px; border:1px solid #d8dce5; border-radius:10px;"></textarea>
+      <select id="galleryStatus" style="padding:12px; border:1px solid #d8dce5; border-radius:10px;">
+        <option value="Draft">Draft</option>
+        <option value="Published">Published</option>
+      </select>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-dark">Save Gallery Item</button>
+        <button type="button" id="cancelGalleryEdit" class="btn">Cancel</button>
+      </div>
+      <div id="galleryMessage" style="display:none; padding:10px 12px; border-radius:10px; background:#f7f9fc;"></div>
+    </form>
+  </div>
+
+  <div class="admin-table-wrap">
+    <div class="admin-table-header">
+      <h3>Saved gallery items</h3>
+      <span style="font-size:0.82rem; color:var(--text-muted);">Click an item to edit it</span>
+    </div>
+    <div id="galleryList" style="padding:24px;"></div>
+    <div id="galleryPagination" style="padding:12px 24px; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+      <button type="button" id="galleryPrevPage" class="btn btn-sm" style="padding:6px 12px;">← Previous</button>
+      <span id="galleryPageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+      <button type="button" id="galleryNextPage" class="btn btn-sm" style="padding:6px 12px;">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/main.js"></script>
+<script>
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const galleryForm = document.getElementById('galleryForm');
+  const galleryIdInput = document.getElementById('galleryId');
+  const galleryTitleInput = document.getElementById('galleryTitle');
+  const galleryCategoryInput = document.getElementById('galleryCategory');
+  const galleryImageInput = document.getElementById('galleryImageInput');
+  const galleryImageDropzone = document.getElementById('galleryImageDropzone');
+  const galleryImagePreview = document.getElementById('galleryImagePreview');
+  const galleryDescriptionInput = document.getElementById('galleryDescription');
+  const galleryStatusInput = document.getElementById('galleryStatus');
+  const galleryMessage = document.getElementById('galleryMessage');
+  const galleryList = document.getElementById('galleryList');
+  const cancelGalleryEdit = document.getElementById('cancelGalleryEdit');
+
+  let selectedGalleryImage = null;
+  let galleryCurrentPage = 1;
+  let galleryItemsPerPage = 10;
+  let galleryAllData = [];
+
+  function showGalleryMessage(message, isError = false) {
+    galleryMessage.style.display = 'block';
+    galleryMessage.textContent = message;
+    galleryMessage.style.background = isError ? '#fff2f2' : '#f2fbf4';
+    galleryMessage.style.color = isError ? '#b42318' : '#027a48';
+  }
+
+  function resetGalleryForm() {
+    galleryForm.reset();
+    galleryIdInput.value = '';
+    galleryStatusInput.value = 'Draft';
+    galleryCategoryInput.value = '';
+    galleryMessage.style.display = 'none';
+    galleryImagePreview.style.display = 'none';
+    galleryImagePreview.innerHTML = '';
+    selectedGalleryImage = null;
+    galleryForm.style.opacity = '1';
+    galleryForm.style.pointerEvents = 'auto';
+  }
+
+  function showImagePreview(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      galleryImagePreview.innerHTML = `
+        <div style="border:1px solid #d8dce5; border-radius:10px; padding:12px; background:#f9fafb; text-align:center;">
+          <img src="${e.target.result}" style="max-width:100%; max-height:150px; border-radius:6px; margin-bottom:8px;" />
+          <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">${file.name}</p>
+          <button type="button" style="margin-top:8px; padding:6px 12px; background:#fee2e2; color:#b42318; border:none; border-radius:6px; cursor:pointer; font-size:0.85rem;" onclick="document.getElementById('galleryImagePreview').innerHTML=''; document.getElementById('galleryImageInput').value=''; selectedGalleryImage=null;">Remove</button>
+        </div>
+      `;
+      galleryImagePreview.style.display = 'block';
+      selectedGalleryImage = file;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  galleryImageDropzone.addEventListener('click', () => galleryImageInput.click());
+  galleryImageInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) {
+      showImagePreview(e.target.files[0]);
+    }
+  });
+
+  galleryImageDropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    galleryImageDropzone.style.borderColor = '#0066cc';
+    galleryImageDropzone.style.background = '#f0f4ff';
+  });
+
+  galleryImageDropzone.addEventListener('dragleave', () => {
+    galleryImageDropzone.style.borderColor = '#d8dce5';
+    galleryImageDropzone.style.background = '#fafbfc';
+  });
+
+  galleryImageDropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    galleryImageDropzone.style.borderColor = '#d8dce5';
+    galleryImageDropzone.style.background = '#fafbfc';
+    if (e.dataTransfer.files[0]) {
+      galleryImageInput.files = e.dataTransfer.files;
+      showImagePreview(e.dataTransfer.files[0]);
+    }
+  });
+
+  function displayGalleryPage() {
+    const start = (galleryCurrentPage - 1) * galleryItemsPerPage;
+    const end = start + galleryItemsPerPage;
+    const pageData = galleryAllData.slice(start, end);
+    const totalPages = Math.max(1, Math.ceil(galleryAllData.length / galleryItemsPerPage));
+
+    if (!pageData.length) {
+      galleryList.innerHTML = '<p style="color:var(--text-muted);">No gallery items yet.</p>';
+    } else {
+      galleryList.innerHTML = pageData.map(item => `
+        <div style="border:1px solid #e5e7eb; border-radius:14px; padding:16px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+            <strong>${item.title || 'Untitled item'}</strong>
+            <span style="font-size:0.85rem; color:var(--text-muted);">${item.status || 'Draft'}</span>
+          </div>
+          <p style="margin:6px 0; color:var(--text-muted);">${item.category || 'Portfolio'}</p>
+          ${item.image ? `<img src="${item.image}" style="max-width:100%; max-height:120px; border-radius:6px; margin:8px 0;" />` : ''}
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+            <button type="button" class="btn btn-sm" data-edit-gallery="${item.id}">Edit</button>
+            <button type="button" class="btn btn-sm" style="background:#fee2e2; color:#b42318;" data-delete-gallery="${item.id}"><i class="bi bi-trash"></i> Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('galleryPageInfo').textContent = `Page ${galleryCurrentPage} of ${totalPages}`;
+    document.getElementById('galleryPrevPage').disabled = galleryCurrentPage === 1;
+    document.getElementById('galleryNextPage').disabled = galleryCurrentPage === totalPages || galleryAllData.length === 0;
+  }
+
+  async function loadGallery() {
+    galleryList.innerHTML = '<p style="color:var(--text-muted);">Loading…</p>';
+    try {
+      const response = await fetch(`${backendBase}/api/gallery`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to load gallery items.');
+      galleryAllData = Array.isArray(data) ? data : [];
+      galleryCurrentPage = 1;
+      displayGalleryPage();
+    } catch (error) {
+      galleryList.innerHTML = `<p style="color:#b42318;">${error.message}</p>`;
+    }
+  }
+
+  galleryForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    if (!galleryTitleInput.value.trim()) {
+      showGalleryMessage('Title is required.', true);
+      return;
+    }
+
+    if (!galleryCategoryInput.value) {
+      showGalleryMessage('Category is required.', true);
+      return;
+    }
+
+    if (!galleryIdInput.value && !selectedGalleryImage) {
+      showGalleryMessage('Image is required for new gallery items.', true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', galleryTitleInput.value.trim());
+    formData.append('category', galleryCategoryInput.value.trim());
+    formData.append('description', galleryDescriptionInput.value.trim());
+    formData.append('status', galleryStatusInput.value);
+    if (selectedGalleryImage) {
+      formData.append('image', selectedGalleryImage);
+    }
+
+    try {
+      // Show saving message and disable form
+      galleryMessage.style.display = 'block';
+      galleryMessage.textContent = 'Saving...';
+      galleryMessage.style.background = '#e3f2fd';
+      galleryMessage.style.color = '#0066cc';
+      galleryForm.style.opacity = '0.6';
+      galleryForm.style.pointerEvents = 'none';
+
+      const method = galleryIdInput.value ? 'PATCH' : 'POST';
+      const url = galleryIdInput.value ? `${backendBase}/api/gallery/${galleryIdInput.value}` : `${backendBase}/api/gallery`;
+      const response = await fetch(url, {
+        method,
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to save gallery item.');
+      showGalleryMessage(data.message || 'Gallery item saved successfully.');
+      resetGalleryForm();
+      loadGallery();
+    } catch (error) {
+      galleryForm.style.opacity = '1';
+      galleryForm.style.pointerEvents = 'auto';
+      showGalleryMessage(error.message, true);
+    }
+  });
+
+  cancelGalleryEdit.addEventListener('click', resetGalleryForm);
+  galleryList.addEventListener('click', async (event) => {
+    const editButton = event.target.closest('[data-edit-gallery]');
+    const deleteButton = event.target.closest('[data-delete-gallery]');
+    
+    if (editButton) {
+      const id = editButton.getAttribute('data-edit-gallery');
+      try {
+        const response = await fetch(`${backendBase}/api/gallery/${id}`);
+        const item = await response.json();
+        if (!response.ok) throw new Error(item.message || 'Unable to load gallery item.');
+        galleryIdInput.value = item.id;
+        galleryTitleInput.value = item.title || '';
+        galleryCategoryInput.value = item.category || '';
+        galleryDescriptionInput.value = item.description || '';
+        galleryStatusInput.value = item.status || 'Draft';
+        galleryImagePreview.innerHTML = item.image ? `<div style="border:1px solid #d8dce5; border-radius:10px; padding:12px; background:#f9fafb; text-align:center;"><img src="${item.image}" style="max-width:100%; max-height:150px; border-radius:6px; margin-bottom:8px;" /><p style="margin:0; font-size:0.85rem; color:var(--text-muted);">Current image</p></div>` : '';
+        galleryImagePreview.style.display = item.image ? 'block' : 'none';
+        selectedGalleryImage = null;
+        galleryTitleInput.focus();
+      } catch (error) {
+        showGalleryMessage(error.message, true);
+      }
+    } else if (deleteButton) {
+      const id = deleteButton.getAttribute('data-delete-gallery');
+      if (confirm('Are you sure you want to delete this gallery item?')) {
+        try {
+          const response = await fetch(`${backendBase}/api/gallery/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Unable to delete gallery item.');
+          showGalleryMessage('Gallery item deleted successfully.');
+          loadGallery();
+        } catch (error) {
+          showGalleryMessage(error.message, true);
+        }
+      }
+    }
+  });
+
+  document.getElementById('galleryPrevPage').addEventListener('click', () => {
+    if (galleryCurrentPage > 1) {
+      galleryCurrentPage--;
+      displayGalleryPage();
+    }
+  });
+
+  document.getElementById('galleryNextPage').addEventListener('click', () => {
+    const totalPages = Math.max(1, Math.ceil(galleryAllData.length / galleryItemsPerPage));
+    if (galleryCurrentPage < totalPages) {
+      galleryCurrentPage++;
+      displayGalleryPage();
+    }
+  });
+
+  loadGallery();
+</script>
+</body>
+</html>

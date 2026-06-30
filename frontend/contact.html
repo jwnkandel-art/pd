@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us: NexaAI</title>
+  <meta name="description" content="Get in touch with NexaAI's team of AI specialists. We'd love to hear about your challenges." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="solutions.html">Solutions</a></li>
+      <li><a href="casestudies.html">Case Studies</a></li>
+      <li><a href="feedback.html">Feedback</a></li>
+      <li><a href="articles.html">Articles</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html" class="nav-cta">Contact Us</a></li>
+    </ul>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="section-tag" style="margin-bottom:14px;">Get In Touch</div>
+    <h1>Contact Us</h1>
+    <p>Ready to transform your workplace with AI? Our specialists are here to help. No obligation, no pressure.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-layout">
+
+      <div class="reveal">
+        <h2>Let's Start a Conversation</h2>
+        <p>Whether you have a specific challenge in mind or are just exploring what AI could do for your organisation, we'd love to hear from you. Our team typically responds within one business day.</p>
+
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+          <div class="contact-detail-text">
+            <strong>Headquarters</strong>
+            <span>One Canada Square, Canary Wharf, London E14 5AB</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div class="contact-detail-text">
+            <strong>Email</strong>
+            <span>hello@nexaai.com</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="bi bi-telephone-fill"></i></div>
+          <div class="contact-detail-text">
+            <strong>Phone</strong>
+            <span>+44 20 1234 5678</span>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-icon"><i class="bi bi-clock-fill"></i></div>
+          <div class="contact-detail-text">
+            <strong>Office Hours</strong>
+            <span>Monday to Friday, 9:00am to 6:00pm GMT</span>
+          </div>
+        </div>
+
+        <div style="margin-top:36px; padding:24px; background:rgba(0,198,255,0.06); border-radius:var(--radius); border:1px solid rgba(0,198,255,0.18);">
+          <p style="font-size:0.88rem; font-weight:600; color:var(--navy); margin-bottom:8px;"><i class="bi bi-globe2"></i> Global Offices</p>
+          <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.7;">Singapore · New York · Dubai · Sydney · Frankfurt</p>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="contact-form-card">
+          <form id="contactForm">
+            <h3 style="font-size:1.25rem; font-weight:700; color:var(--navy); margin-bottom:24px;">Send Us a Message</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="fullName" name="fullName" placeholder="Jane Smith" autocomplete="name" />
+                <span class="field-error" id="err-fullName"></span>
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="jane@company.com" autocomplete="email" />
+                <span class="field-error" id="err-email"></span>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="+44 7700 000000" autocomplete="tel" />
+                <span class="field-error" id="err-phone"></span>
+              </div>
+              <div class="form-group">
+                <label for="company">Company Name <span class="required">*</span></label>
+                <input type="text" id="company" name="company" placeholder="Acme Corporation" autocomplete="organization" />
+                <span class="field-error" id="err-company"></span>
+              </div>
+              <div class="form-group">
+                <label for="country">Country <span class="required">*</span></label>
+                <select id="country" name="country" autocomplete="country">
+                  <option value="">Select your country…</option>
+                  <option>United Kingdom</option>
+                  <option>United States</option>
+                  <option>Australia</option>
+                  <option>Canada</option>
+                  <option>Germany</option>
+                  <option>France</option>
+                  <option>Singapore</option>
+                  <option>UAE</option>
+                  <option>India</option>
+                  <option>Japan</option>
+                  <option>South Africa</option>
+                  <option>Brazil</option>
+                  <option>Netherlands</option>
+                  <option>Sweden</option>
+                  <option>Other</option>
+                </select>
+                <span class="field-error" id="err-country"></span>
+              </div>
+              <div class="form-group">
+                <label for="jobTitle">Job Title <span class="required">*</span></label>
+                <input type="text" id="jobTitle" name="jobTitle" placeholder="Chief Technology Officer" />
+                <span class="field-error" id="err-jobTitle"></span>
+              </div>
+              <div class="form-group full">
+                <label for="jobDetails">How Can We Help? <span class="required">*</span></label>
+                <textarea id="jobDetails" name="jobDetails" placeholder="Tell us about your challenge, project, or what you're looking to achieve with AI…"></textarea>
+                <span class="field-error" id="err-jobDetails"></span>
+              </div>
+            </div>
+            <div id="contactFormError" style="display:none; margin-top:14px; padding:12px 14px; background:rgba(239,68,68,0.08); color:#b91c1c; border-radius:var(--radius-sm); font-size:0.9rem;"></div>
+            <button type="submit" class="btn btn-primary form-submit">Send Message →</button>
+          </form>
+
+          <div class="success-message" id="successMessage">
+            <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+            <h3>Message Received!</h3>
+            <p>Thank you for reaching out. One of our AI specialists will be in touch within one business day. We look forward to learning more about your organisation.</p>
+            <br>
+            <a href="index.html" class="btn btn-dark btn-sm">Back to Home</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="logo-mark">N</div><span>NexaAI</span></a>
+        <p>Empowering industries with intelligent AI solutions and transforming the digital employee experience worldwide.</p>
+      </div>
+      <div class="footer-col"><h4>Solutions</h4><ul><li><a href="solutions.html">AI Virtual Assistant</a></li><li><a href="solutions.html">Prototyping Tools</a></li><li><a href="solutions.html">DEX Platform</a></li><li><a href="solutions.html">Analytics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="casestudies.html">Case Studies</a></li><li><a href="articles.html">Articles</a></li><li><a href="feedback.html">Testimonials</a></li><li><a href="gallery.html">Gallery</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="contact.html">Contact Us</a></li><li><a href="admin.html">Admin Area</a></li><li><a href="mailto:hello@nexaai.com">hello@nexaai.com</a></li><li><a href="tel:+441234567890">+44 1234 567 890</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2025 NexaAI. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

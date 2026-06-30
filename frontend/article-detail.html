@@ -80,7 +80,7 @@
 
 <script src="js/main.js"></script>
 <script>
-  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
   const params = new URLSearchParams(window.location.search);
   const articleId = params.get('id');
   const articleSlug = params.get('slug');

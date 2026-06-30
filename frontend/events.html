@@ -397,7 +397,7 @@
 
 <script src="js/main.js"></script>
 <script>
-  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
   const tabs = document.querySelectorAll('.events-tab');
   const tabUpcoming = document.getElementById('tab-upcoming');
   const tabPast = document.getElementById('tab-past');
@@ -449,6 +449,39 @@
     }
   }
 
+  function showSiteToast(message) {
+    let toast = document.getElementById('siteToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'siteToast';
+      toast.className = 'site-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(showSiteToast.timeout);
+    showSiteToast.timeout = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function attachRecapHandlers() {
+    document.querySelectorAll('.js-view-recap').forEach(button => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const title = button.dataset.eventTitle || 'this event';
+        const date = button.dataset.eventDate || '';
+        const params = new URLSearchParams({
+          request: 'event-recap',
+          event: title,
+          date
+        });
+        showSiteToast('Please fill out the contact form and our team will help with the recap request.');
+        setTimeout(() => {
+          window.location.href = `contact.html?${params.toString()}`;
+        }, 900);
+      });
+    });
+  }
+
   function buildEventCard(event, isPast = false) {
     const date = formatDisplayDate(event.eventDate || event.createdAt || '');
     const category = eventCategory(event);
@@ -458,6 +491,8 @@
     const ctaText = isPast ? 'View Recap' : 'Register Free';
     const ctaLink = isPast ? '#' : 'contact.html';
     const description = String(event.description || '').trim() || 'Details about the event will be available soon.';
+    const eventTitle = String(event.title || 'Untitled Event');
+    const eventDateText = `${date.day} ${date.month} ${date.year}`.trim();
 
     return `
       <div class="event-card reveal${isPast ? ' past-event-card' : ''}">
@@ -475,7 +510,7 @@
           <p>${description}</p>
           <div class="event-footer">
             <span class="event-spots">${availability}</span>
-            <a href="${ctaLink}" class="btn ${isPast ? 'btn-dark btn-sm' : event.status && event.status.toLowerCase() === 'cancelled' ? 'btn-outline btn-sm' : 'btn-dark btn-sm'}">${ctaText}</a>
+            ${isPast ? `<button type="button" class="btn btn-dark btn-sm js-view-recap" data-event-title="${eventTitle}" data-event-date="${eventDateText}">${ctaText}</button>` : `<a href="${ctaLink}" class="btn ${event.status && event.status.toLowerCase() === 'cancelled' ? 'btn-outline btn-sm' : 'btn-dark btn-sm'}">${ctaText}</a>`}
           </div>
         </div>
       </div>
@@ -510,6 +545,8 @@
     } else {
       pastPlaceholder.innerHTML = '<div style="grid-column:1 / -1; text-align:center; padding:36px 0; color:var(--text-muted);">No past events available yet.</div>';
     }
+
+    attachRecapHandlers();
 
     const featured = upcoming.find(event => event.featured) || upcoming[0] || past[0];
     if (featured) {

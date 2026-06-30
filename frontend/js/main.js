@@ -69,12 +69,54 @@
   els.forEach(el => io.observe(el));
 })();
 
+function showSiteToast(message) {
+  let toast = document.getElementById('siteToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'siteToast';
+    toast.className = 'site-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(showSiteToast.timeout);
+  showSiteToast.timeout = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name) || '';
+}
+
+function prefillRecapRequest() {
+  const requestType = getQueryParam('request');
+  if (requestType !== 'event-recap') return;
+
+  const eventTitle = getQueryParam('event') || 'this event';
+  const eventDate = getQueryParam('date') || '';
+  const jobTitleField = document.getElementById('jobTitle');
+  const jobDetailsField = document.getElementById('jobDetails');
+
+  if (jobTitleField) {
+    jobTitleField.value = 'Event Recap Request';
+  }
+
+  if (jobDetailsField) {
+    const detailText = `Hello admin, I would like to request the recap for ${eventTitle}${eventDate ? ` (${eventDate})` : ''}. Please share the recap materials or any relevant follow-up details.`;
+    jobDetailsField.value = detailText;
+  }
+
+  showSiteToast('Your recap request has been prepared. Please send the form and our team will follow up.');
+}
+
 /* ---------- Contact form validation & submission ---------- */
 (function initContactForm() {
   const form = document.getElementById('contactForm');
   if (!form) return;
 
-  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  prefillRecapRequest();
+
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
 
   const rules = {
     fullName:    v => v.trim().length >= 2 || 'Please enter your full name.',
@@ -173,7 +215,7 @@
   const protectedAdminPages = ['dashboard.html', 'articles.html', 'events.html', 'gallery.html'];
   const dashboardPath = isRootAdminPage ? 'admin/dashboard.html' : 'dashboard.html';
   const loginPath = isRootAdminPage ? 'admin/login.html' : 'login.html';
-  const backendBase = (window.NEXAAI_BACKEND_URL || 'http://localhost:4000').replace(/\/$/, '');
+  const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
   let inquiryAllRows = [];
   let inquiryCurrentPage = 1;
   const inquiryRowsPerPage = 10;

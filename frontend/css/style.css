@@ -798,6 +798,30 @@ footer {
   letter-spacing: 2px;
 }
 
+.site-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--navy);
+  color: var(--white);
+  padding: 12px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  max-width: min(90vw, 420px);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.site-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .quote-mark {
   font-size: 3rem;
   line-height: 0;

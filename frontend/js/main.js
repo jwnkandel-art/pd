@@ -210,9 +210,11 @@ function prefillRecapRequest() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (!loginWrap && !dashboard) return;
 
-  const currentPage = window.location.pathname.split('/').pop().split('?')[0];
-  const isRootAdminPage = currentPage === 'admin.html';
-  const protectedAdminPages = ['dashboard.html', 'articles.html', 'events.html', 'gallery.html'];
+  const rawPage = window.location.pathname.split('/').pop().split('?')[0] || '';
+  const currentPage = rawPage.toLowerCase();
+  const normalizedPage = currentPage.replace(/\.html$/, '');
+  const isRootAdminPage = currentPage === 'admin.html' || currentPage === 'admin';
+  const protectedAdminPages = ['dashboard', 'dashboard.html', 'articles', 'articles.html', 'events', 'events.html', 'gallery', 'gallery.html'];
   const dashboardPath = isRootAdminPage ? 'admin/dashboard.html' : 'dashboard.html';
   const loginPath = isRootAdminPage ? 'admin/login.html' : 'login.html';
   const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
@@ -607,13 +609,15 @@ function prefillRecapRequest() {
 
   (async () => {
     const session = getStoredSession();
-    const isProtectedPage = protectedAdminPages.includes(currentPage);
+    const isProtectedPage = protectedAdminPages.includes(normalizedPage);
+    const isDashboardPage = ['dashboard', 'dashboard.html'].includes(normalizedPage);
+    const isLoginPage = ['login.html', 'admin.html', 'admin', ''].includes(normalizedPage);
 
     if (isProtectedPage) {
       if (session.token) {
         const isValid = await validateStoredSession();
         if (isValid) {
-          if (currentPage === 'dashboard.html') {
+          if (isDashboardPage) {
             showDashboard(session.user);
           }
         } else {
@@ -622,7 +626,7 @@ function prefillRecapRequest() {
       } else {
         window.location.href = loginPath;
       }
-    } else if (currentPage === 'login.html' || currentPage === 'admin.html') {
+    } else if (isLoginPage) {
       if (session.token) {
         const isValid = await validateStoredSession();
         if (isValid) {

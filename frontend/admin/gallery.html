@@ -87,7 +87,10 @@
     <div id="galleryList" style="padding:24px;"></div>
     <div id="galleryPagination" style="padding:12px 24px; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
       <button type="button" id="galleryPrevPage" class="btn btn-sm" style="padding:6px 12px;">← Previous</button>
-      <span id="galleryPageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span id="galleryPageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+        <span id="galleryRangeInfo" style="font-size:0.82rem; color:var(--text-muted);">Showing 0 of 0</span>
+      </div>
       <button type="button" id="galleryNextPage" class="btn btn-sm" style="padding:6px 12px;">Next →</button>
     </div>
   </div>
@@ -111,7 +114,7 @@
 
   let selectedGalleryImage = null;
   let galleryCurrentPage = 1;
-  let galleryItemsPerPage = 10;
+  let galleryItemsPerPage = 5;
   let galleryAllData = [];
 
   function showGalleryMessage(message, isError = false) {
@@ -179,11 +182,12 @@
   });
 
   function displayGalleryPage() {
+    const totalPages = Math.max(1, Math.ceil(galleryAllData.length / galleryItemsPerPage));
+    galleryCurrentPage = Math.max(1, Math.min(galleryCurrentPage, totalPages));
     const start = (galleryCurrentPage - 1) * galleryItemsPerPage;
     const end = start + galleryItemsPerPage;
     const pageData = galleryAllData.slice(start, end);
-    const totalPages = Math.max(1, Math.ceil(galleryAllData.length / galleryItemsPerPage));
-
+    
     if (!pageData.length) {
       galleryList.innerHTML = '<p style="color:var(--text-muted);">No gallery items yet.</p>';
     } else {
@@ -203,7 +207,12 @@
       `).join('');
     }
 
-    document.getElementById('galleryPageInfo').textContent = `Page ${galleryCurrentPage} of ${totalPages}`;
+    const pageInfo = document.getElementById('galleryPageInfo');
+    const rangeInfo = document.getElementById('galleryRangeInfo');
+    if (pageInfo) pageInfo.textContent = `Page ${galleryCurrentPage} of ${totalPages}`;
+    if (rangeInfo) rangeInfo.textContent = galleryAllData.length
+      ? `Showing ${start + 1}–${Math.min(end, galleryAllData.length)} of ${galleryAllData.length}`
+      : 'Showing 0 of 0';
     document.getElementById('galleryPrevPage').disabled = galleryCurrentPage === 1;
     document.getElementById('galleryNextPage').disabled = galleryCurrentPage === totalPages || galleryAllData.length === 0;
   }
@@ -215,7 +224,8 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to load gallery items.');
       galleryAllData = Array.isArray(data) ? data : [];
-      galleryCurrentPage = 1;
+      const totalPages = Math.max(1, Math.ceil(galleryAllData.length / galleryItemsPerPage));
+      galleryCurrentPage = Math.min(galleryCurrentPage, totalPages);
       displayGalleryPage();
     } catch (error) {
       galleryList.innerHTML = `<p style="color:#b42318;">${error.message}</p>`;

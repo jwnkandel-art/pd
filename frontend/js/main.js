@@ -218,7 +218,7 @@ function prefillRecapRequest() {
   const backendBase = (window.NEXAAI_BACKEND_URL || 'https://pd-three-chi.vercel.app').replace(/\/$/, '');
   let inquiryAllRows = [];
   let inquiryCurrentPage = 1;
-  const inquiryRowsPerPage = 10;
+  const inquiryRowsPerPage = 5;
   let activeAdminUser = null;
   let activeInquiryId = null;
 
@@ -226,10 +226,11 @@ function prefillRecapRequest() {
     const tbody = document.getElementById('inquiryBody');
     if (!tbody) return;
 
+    const totalPages = Math.max(1, Math.ceil(inquiryAllRows.length / inquiryRowsPerPage));
+    inquiryCurrentPage = Math.max(1, Math.min(inquiryCurrentPage, totalPages));
     const start = (inquiryCurrentPage - 1) * inquiryRowsPerPage;
     const end = start + inquiryRowsPerPage;
     const pageRows = inquiryAllRows.slice(start, end);
-    const totalPages = Math.max(1, Math.ceil(inquiryAllRows.length / inquiryRowsPerPage));
 
     tbody.innerHTML = pageRows.length ? pageRows.map(r => `
       <tr>
@@ -244,9 +245,13 @@ function prefillRecapRequest() {
     `).join('') : '<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">No inquiries found.</td></tr>';
 
     const pageInfo = document.getElementById('inquiryPageInfo');
+    const rangeInfo = document.getElementById('inquiryRangeInfo');
     const prevBtn = document.getElementById('inquiryPrevPage');
     const nextBtn = document.getElementById('inquiryNextPage');
     if (pageInfo) pageInfo.textContent = `Page ${inquiryCurrentPage} of ${totalPages}`;
+    if (rangeInfo) rangeInfo.textContent = inquiryAllRows.length
+      ? `Showing ${start + 1}–${Math.min(end, inquiryAllRows.length)} of ${inquiryAllRows.length}`
+      : 'Showing 0 of 0';
     if (prevBtn) prevBtn.disabled = inquiryCurrentPage === 1;
     if (nextBtn) nextBtn.disabled = inquiryCurrentPage === totalPages || inquiryAllRows.length === 0;
   }

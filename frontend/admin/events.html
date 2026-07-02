@@ -87,7 +87,10 @@
     <div id="eventList" style="padding:24px;"></div>
     <div id="eventPagination" style="padding:12px 24px; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
       <button type="button" id="eventPrevPage" class="btn btn-sm" style="padding:6px 12px;">← Previous</button>
-      <span id="eventPageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <span id="eventPageInfo" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+        <span id="eventRangeInfo" style="font-size:0.82rem; color:var(--text-muted);">Showing 0 of 0</span>
+      </div>
       <button type="button" id="eventNextPage" class="btn btn-sm" style="padding:6px 12px;">Next →</button>
     </div>
   </div>
@@ -127,14 +130,15 @@
   }
 
   let eventCurrentPage = 1;
-  let eventItemsPerPage = 10;
+  let eventItemsPerPage = 5;
   let eventAllData = [];
 
   function displayEventPage() {
+    const totalPages = Math.max(1, Math.ceil(eventAllData.length / eventItemsPerPage));
+    eventCurrentPage = Math.max(1, Math.min(eventCurrentPage, totalPages));
     const start = (eventCurrentPage - 1) * eventItemsPerPage;
     const end = start + eventItemsPerPage;
     const pageData = eventAllData.slice(start, end);
-    const totalPages = Math.ceil(eventAllData.length / eventItemsPerPage);
 
     if (!pageData.length) {
       eventList.innerHTML = '<p style="color:var(--text-muted);">No events yet.</p>';
@@ -154,9 +158,14 @@
       `).join('');
     }
 
-    document.getElementById('eventPageInfo').textContent = `Page ${eventCurrentPage} of ${totalPages}`;
+    const pageInfo = document.getElementById('eventPageInfo');
+    const rangeInfo = document.getElementById('eventRangeInfo');
+    if (pageInfo) pageInfo.textContent = `Page ${eventCurrentPage} of ${totalPages}`;
+    if (rangeInfo) rangeInfo.textContent = eventAllData.length
+      ? `Showing ${start + 1}–${Math.min(end, eventAllData.length)} of ${eventAllData.length}`
+      : 'Showing 0 of 0';
     document.getElementById('eventPrevPage').disabled = eventCurrentPage === 1;
-    document.getElementById('eventNextPage').disabled = eventCurrentPage === totalPages || totalPages === 0;
+    document.getElementById('eventNextPage').disabled = eventCurrentPage === totalPages || eventAllData.length === 0;
   }
 
   async function loadEvents() {
@@ -166,7 +175,8 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to load events.');
       eventAllData = Array.isArray(data) ? data : [];
-      eventCurrentPage = 1;
+      const totalPages = Math.max(1, Math.ceil(eventAllData.length / eventItemsPerPage));
+      eventCurrentPage = Math.min(eventCurrentPage, totalPages);
       displayEventPage();
     } catch (error) {
       eventList.innerHTML = `<p style="color:#b42318;">${error.message}</p>`;

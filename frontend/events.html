@@ -495,7 +495,7 @@
     const eventDateText = `${date.day} ${date.month} ${date.year}`.trim();
 
     return `
-      <div class="event-card reveal${isPast ? ' past-event-card' : ''}">
+      <div class="event-card${isPast ? ' past-event-card' : ''}">
         <div class="event-date-block">
           <div class="event-day">${date.day}</div>
           <div class="event-month">${date.month}</div>
